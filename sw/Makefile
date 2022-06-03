@@ -1,16 +1,19 @@
-R5_UI_APP := $(WS_DIR)/$(PLATFORM_NAME)/r5_ui.elf
-R5_FUNCTION_GENERATOR_APP := $(WS_DIR)/$(PLATFORM_NAME)/r5_function_generator.elf
+APP_PRJS := $(WS_DIR)/r5_ui/r5_ui.prj \
+					  $(WS_DIR)/r5_function_generator/r5_function_generator.prj
+APPS := $(WS_DIR)/r5_ui/Debug/r5_ui.elf \
+			  $(WS_DIR)/r5_function_generator/Debug/r5_function_generator.elf
 
-.SILENT:
 .PHONY: all clean
 
-all: $(R5_UI_APP) $(R5_FUNCTION_GENERATOR_APP)
+all: $(APPS)
 
-$(R5_UI_APP):
-	xsct -nodisp -sdx app.tcl $(PLATFORM_NAME) $(XSA_DIR) $(WS_DIR)
+$(APP_PRJS):
+	xsct -nodisp -sdx app_create.tcl $(PLATFORM_NAME) $(WS_DIR) $(basename $(@F))
 
-$(R5_FUNCTION_GENERATOR_APP):
-	echo "Not yet implemented"
+$(APPS): $(APP_PRJS)
+	xsct -nodisp -sdx app_build.tcl $(PLATFORM_NAME) $(WS_DIR) $(basename $(@F))
 
 clean:
-	rm -f $(R5_UI_APP) $(R5_FUNCTION_GENERATOR_APP)
+	rm -rf .Xil
+	xsct -nodisp -sdx -eval "setws $(WS_DIR); platform active $(PLATFORM_NAME); app remove r5_ui"
+	xsct -nodisp -sdx -eval "setws $(WS_DIR); platform active $(PLATFORM_NAME); app remove r5_function_generator"

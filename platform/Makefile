@@ -1,4 +1,4 @@
-.SILENT:
+
 .PHONY: all clean
 
 all:  $(WS_DIR)/$(PLATFORM_NAME)/platform.spr
@@ -8,4 +8,4 @@ all:  $(WS_DIR)/$(PLATFORM_NAME)/platform.spr
 	xsct -nodisp -sdx pfm.tcl $(PLATFORM_NAME) $(XSA_DIR) $(WS_DIR)
 
 clean:
-	rm -rf $(PLATFORM_NAME) $(WS_PATH) .Xil
+	rm -rf $(PLATFORM_NAME) $(WS_DIR) .Xil

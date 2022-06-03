@@ -7,7 +7,6 @@ export XSA_DIR := $(CWD)/hw/build
 export XSA := $(XSA_DIR)/$(PLATFORM_NAME).xsa
 export WS_DIR := $(CWD)/ws
 
-.SILENT:
 .PHONY: all xsa bitstream platform sw publish clean
 .ONESHELL:
 
@@ -31,9 +30,15 @@ publish: all
 	cd ..
 	zip -r $(TIME)_ece554_proj_bwiec.zip ece554_proj
 
-clean:
+clean_hw:
 	make -C hw clean
+
+clean_platform:
 	make -C platform clean
+
+clean_sw:
 	make -C sw clean
+
+clean: clean_hw clean_platform clean_sw
 	rm -rf .Xil
 	rm -f *.jou *.log
