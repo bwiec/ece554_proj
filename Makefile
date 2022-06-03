@@ -8,7 +8,7 @@ export XSA := $(XSA_DIR)/$(PLATFORM_NAME).xsa
 export WS_DIR := $(CWD)/ws
 
 .SILENT:
-.PHONY: all xsa bitstream platform publish clean
+.PHONY: all xsa bitstream platform sw publish clean
 .ONESHELL:
 
 all: xsa bitstream
@@ -21,8 +21,11 @@ bitstream: build/proj/proj.runs/top.bit
 build/proj/proj.runs/top.bit: $(XSA)
 	make -C hw bitstream
 
-platform:
+platform: 
 	make -C platform all
+
+sw: 
+	make -C sw all
 
 publish: all
 	cd ..
