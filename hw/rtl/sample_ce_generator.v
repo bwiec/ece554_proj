@@ -49,6 +49,7 @@ module sample_ce_generator
   );
 
   // Main counter
+  reg [31:0] cnt = 0;
   always @ (posedge clk) begin
     if (rst || ce) begin
       cnt <= 0;

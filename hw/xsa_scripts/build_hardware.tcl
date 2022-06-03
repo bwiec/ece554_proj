@@ -30,7 +30,7 @@ source "../xsa_scripts/bd.tcl"
 generate_target all [get_files "${proj_name}/${proj_name}.srcs/sources_1/bd/design_1/design_1.bd"]
 make_wrapper -files [get_files "${proj_name}/${proj_name}.srcs/sources_1/bd/design_1/design_1.bd"] -top
 import_files -force -norecurse "${proj_name}/${proj_name}.srcs/sources_1/bd/design_1/hdl/design_1_wrapper.v"
-set_property top "design_1_wrapper" [current_fileset]
+set_property top "top" [current_fileset]
 
 #-----------------------------------------------------------
 # Export to XSA

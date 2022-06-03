@@ -10,16 +10,19 @@ export XSA := $(XSA_DIR)/design_1_wrapper.xsa
 .PHONY: all xsa publish clean
 .ONESHELL:
 
-all: xsa
+all: xsa bitstream
 
 xsa: $(XSA)
 $(XSA):
 	make -C hw all
 
+bitstream: build/proj/proj.runs/top.bit
+build/proj/proj.runs/top.bit: $(XSA)
+	make -C hw bitstream
+
 publish: all
 	cd ..
 	zip -r $(TIME)_ece554_proj_bwiec.zip ece554_proj
-
 
 clean:
 	make -C hw clean

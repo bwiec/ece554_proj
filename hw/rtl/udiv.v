@@ -30,7 +30,7 @@ module udiv
 
 	// Main FSM
 	reg                     input_ready_for_data_i = 0;
-	reg [clog2(DWIDTH)-1:0] calc_cycle_cnt         = 0;
+	reg [$clog2(DWIDTH)-1:0] calc_cycle_cnt         = 0;
 	reg                     capture_strobe         = 0;
 	reg [1:0]               state                  = 0;
 	localparam [1:0] IDLE    = 2'b00,
