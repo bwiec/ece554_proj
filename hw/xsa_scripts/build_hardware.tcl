@@ -1,3 +1,5 @@
+set PLATFORM_NAME [lindex $argv 0]
+
 #-----------------------------------------------------------
 # Abort if design already exists
 #-----------------------------------------------------------
@@ -36,8 +38,8 @@ set_property top "top" [current_fileset]
 # Export to XSA
 #-----------------------------------------------------------
 set_property platform.platform_state "pre_synth" [current_project]
-write_hw_platform -force -fixed "design_1_wrapper.xsa"
-validate_hw_platform "design_1_wrapper.xsa" -verbose
+write_hw_platform -force -fixed "${PLATFORM_NAME}.xsa"
+validate_hw_platform "${PLATFORM_NAME}.xsa" -verbose
 
 exit
 
