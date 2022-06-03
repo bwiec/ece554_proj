@@ -1,14 +1,11 @@
 #include <iostream>
 #include <queue>
+#include "debug.hpp"
+#include "message_queue.hpp"
 
 using namespace std;
 
 #define DEBUG
-#ifdef DEBUG
-#define DEBUG_MSG(str) do{cout << str << endl;} while(false)
-#else
-#define DEBUG_MSG(str) do{} while(false)
-#endif
 
 typedef enum tasks
 {

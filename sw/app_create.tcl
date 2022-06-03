@@ -27,3 +27,5 @@ app create -name ${app_name} \
 
 set CWD [pwd]
 importsources -name ${app_name} -path "${CWD}/${app_name}" -soft-link
+importsources -name ${app_name} -path "${CWD}/common" -soft-link
+app config -set include-path ${ws_path}/${app_name}/include
