@@ -2,6 +2,7 @@
 #include <queue>
 #include "debug.hpp"
 #include "message_queue.hpp"
+#include "menu.hpp"
 
 using namespace std;
 
