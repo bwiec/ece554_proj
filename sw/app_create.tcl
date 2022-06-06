@@ -26,6 +26,10 @@ app create -name ${app_name} \
   -os standalone -lang C++ -template {Empty Application (C++)}
 
 set CWD [pwd]
-importsources -name ${app_name} -path "${CWD}/${app_name}" -soft-link
-importsources -name ${app_name} -path "${CWD}/common" -soft-link
-app config -set include-path ${ws_path}/${app_name}/include
+importsources -name ${app_name} -path "${CWD}/${app_name}/src" -soft-link
+importsources -name ${app_name} -path "${CWD}/common/src" -soft-link
+#app config -name ${app_name} -add include-path "${ws_path}/${app_name}/include"
+app config -name ${app_name} -add include-path "${CWD}/${app_name}/include"
+#app config -name ${app_name} -add include-path "${ws_path}/common/include"
+app config -name ${app_name} -add include-path "${CWD}/common/include"
+
