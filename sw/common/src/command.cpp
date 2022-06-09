@@ -12,7 +12,6 @@ command::command()
   }
 }
 
-
 bool command::channel_index_out_of_bounds(unsigned char idx)
 {
   if (idx < 0 || idx > NUM_CHANNELS)
