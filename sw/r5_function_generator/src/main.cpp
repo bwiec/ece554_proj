@@ -50,6 +50,10 @@ int main(int argc, char* argv[])
 	  cmd.set_pattern(ii, (pattern_t)ii);
 	  cmd.set_pattern_specific(ii, 0);
   }
+  cmd.set_frequency(1, 2);
+  cmd.set_frequency(2, 2);
+  cmd.set_frequency(3, 2);
+
   signal_generator* waveform_generators[NUM_CHANNELS];
   for (int ii = 0; ii < NUM_CHANNELS; ii++)
   {
