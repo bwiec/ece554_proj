@@ -52,7 +52,7 @@ module top
   )
   sample_ce_generator_inst
   (
-    .clk(clk),
+    .clk(clk_100mhz),
     .rst(!resetn),
     .sample_period_ns(sample_period_ns),
     .ce(sample_ce)
