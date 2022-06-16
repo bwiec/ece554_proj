@@ -7,5 +7,5 @@ int triangle_generator::calculate_sample(int n)
 
   float result = 2.0*abs(t*f - floor(t*f + 1.0/2.0));
 
-  return (int)result;
+  return (int)(result*(1<<16));
 }

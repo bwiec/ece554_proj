@@ -6,6 +6,12 @@ signal_generator::signal_generator(command* cmd, int channel_idx)
   _channel_idx = channel_idx;
 }
 
+int signal_generator::calculate_sample(int n)
+{
+	cerr << "Non-implemented base class." << endl;
+	return -1;
+}
+
 signal_generator::~signal_generator()
 {
   

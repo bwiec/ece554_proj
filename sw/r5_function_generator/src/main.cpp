@@ -6,6 +6,7 @@
 #include "message_queue.hpp"
 #include "reset.hpp"
 #include "wdt.hpp"
+#include "signal_generator.hpp"
 #include "sine_generator.hpp"
 #include "hw_fifo.hpp"
 
@@ -24,25 +25,36 @@ int main(int argc, char* argv[])
 {
   cout << "Starting r5_function_generator" << endl;
 
+  // Initialize peripherals and local objects
   wdt wdt_inst(XPAR_AXI_GPIO_0_DEVICE_ID);
   reset reset_inst(XPAR_AXI_GPIO_2_DEVICE_ID);
-  gpio sample_rate_gpio_inst(XPAR_AXI_GPIO_1_DEVICE_ID);
+  gpio sample_rate_gpio_inst(XPAR_AXI_GPIO_1_DEVICE_ID); // Single sample period controls all channels for now
   sample_rate_gpio_inst.write(2*1000*1000);
 
+  hw_fifo hw_fifo0_inst(XPAR_AXI_FIFO_MM_S_0_DEVICE_ID);
+  hw_fifo hw_fifo1_inst(XPAR_AXI_FIFO_MM_S_1_DEVICE_ID);
+  hw_fifo hw_fifo2_inst(XPAR_AXI_FIFO_MM_S_2_DEVICE_ID);
+  hw_fifo hw_fifo3_inst(XPAR_AXI_FIFO_MM_S_3_DEVICE_ID);
+  hw_fifo* hw_fifos[NUM_CHANNELS] = {&hw_fifo0_inst, &hw_fifo1_inst, &hw_fifo2_inst, &hw_fifo3_inst};
+
+  // Dummy command for now
   command cmd;
-  cmd.set_sample_rate(0, 200);
-  cmd.set_frequency(0, 10);
-  cmd.set_channel_is_enabled(0);
-  cmd.set_pattern(0, PATTERN_SINE);
-  cmd.set_pattern_specific(0, 0);
-  sine_generator ch0_waveform_generator(&cmd, 0);
-  hw_fifo hw_fifo_inst(XPAR_AXI_FIFO_MM_S_0_DEVICE_ID);
+  for (int ii = 0; ii < NUM_CHANNELS; ii++)
+  {
+	  cmd.set_sample_rate(ii, 200);
+	  cmd.set_frequency(ii, 10);
+	  cmd.set_channel_is_enabled(ii);
+	  cmd.set_pattern(ii, PATTERN_SINE);
+	  cmd.set_pattern_specific(ii, 0);
+  }
+  signal_generator* waveform_generators[NUM_CHANNELS];
+
 
   int n;
   tasks_t cur_task = RELEASE_RESET;
   while (1)
   {
-	int sample;
+	int sample = 0;
     switch(cur_task)
     {
       case RELEASE_RESET:
@@ -57,7 +69,11 @@ int main(int argc, char* argv[])
     	break;
       case RECV_CMD:
         DEBUG_MSG("RECV_CMD state");
-        cur_task = SEND_RESP;
+        for (int ii = 0; ii < NUM_CHANNELS; ii++)
+        {
+        	waveform_generators[ii] = new sine_generator(&cmd, ii);
+        	cur_task = SEND_RESP;
+        }
         break;
       case SEND_RESP:
     	DEBUG_MSG("SEND_RESP state");
@@ -65,8 +81,11 @@ int main(int argc, char* argv[])
         break;
       case SEND_SAMPLES:
         DEBUG_MSG("SEND_SAMPLES state");
-        sample = ch0_waveform_generator.calculate_sample(n);
-        hw_fifo_inst.push(sample);
+        for (int ii = 0; ii < NUM_CHANNELS; ii++)
+        {
+        	sample = waveform_generators[ii]->calculate_sample(n);
+        	hw_fifos[ii]->push(sample);
+        }
         n++;
         cur_task = PET_WDT;
         break;

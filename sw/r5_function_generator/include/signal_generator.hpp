@@ -13,6 +13,6 @@ class signal_generator
 
   public:
     signal_generator(command* cmd, int channel_idx);
-    virtual int calculate_sample(int n) = 0;
+    virtual int calculate_sample(int n);
     ~signal_generator();
 };

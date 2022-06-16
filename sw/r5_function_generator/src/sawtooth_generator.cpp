@@ -7,5 +7,5 @@ int sawtooth_generator::calculate_sample(int n)
 
   float result = 2.0*(t*f - floor(1/2 + t*f));
 
-  return (int)result;
+  return (int)(result*(1<<16));
 }
