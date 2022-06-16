@@ -6,6 +6,8 @@
 #include "message_queue.hpp"
 #include "reset.hpp"
 #include "wdt.hpp"
+#include "sine_generator.hpp"
+#include "hw_fifo.hpp"
 
 using namespace std;
 
@@ -24,10 +26,23 @@ int main(int argc, char* argv[])
 
   wdt wdt_inst(XPAR_AXI_GPIO_0_DEVICE_ID);
   reset reset_inst(XPAR_AXI_GPIO_2_DEVICE_ID);
+  gpio sample_rate_gpio_inst(XPAR_AXI_GPIO_1_DEVICE_ID);
+  sample_rate_gpio_inst.write(2*1000*1000);
 
+  command cmd;
+  cmd.set_sample_rate(0, 200);
+  cmd.set_frequency(0, 10);
+  cmd.set_channel_is_enabled(0);
+  cmd.set_pattern(0, PATTERN_SINE);
+  cmd.set_pattern_specific(0, 0);
+  sine_generator ch0_waveform_generator(&cmd, 0);
+  hw_fifo hw_fifo_inst(XPAR_AXI_FIFO_MM_S_0_DEVICE_ID);
+
+  int n;
   tasks_t cur_task = RELEASE_RESET;
   while (1)
   {
+	int sample;
     switch(cur_task)
     {
       case RELEASE_RESET:
@@ -50,13 +65,16 @@ int main(int argc, char* argv[])
         break;
       case SEND_SAMPLES:
         DEBUG_MSG("SEND_SAMPLES state");
+        sample = ch0_waveform_generator.calculate_sample(n);
+        hw_fifo_inst.push(sample);
+        n++;
         cur_task = PET_WDT;
         break;
       default:
         cerr << "Unknown task" << endl;
         return -1;
     }
-	#ifdef DEBUG
+	#ifdef MYDEBUG
     usleep(100*1000);
 	#endif
   }

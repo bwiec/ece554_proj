@@ -7,5 +7,5 @@ int sine_generator::calculate_sample(int n)
 
   float result = sin(f*t);
 
-  return (int)result;
+  return (int)(result*(1<<16));
 }

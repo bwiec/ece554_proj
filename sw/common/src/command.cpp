@@ -32,9 +32,9 @@ bool command::sample_rate_out_of_bounds(unsigned char sample_rate)
   return false;
 }
 
-bool command::frequency_out_of_bounds(unsigned char frequency)
+bool command::frequency_out_of_bounds(unsigned char frequency, unsigned char sample_rate)
 {
-  if (frequency > frequency / 2)
+  if (frequency > sample_rate / 2)
   {
     cerr << "ERROR! Illegal frequency " << frequency << endl;
     return true;
@@ -101,7 +101,7 @@ unsigned char command::get_sample_rate(unsigned char idx)
 void command::set_frequency(unsigned char idx, unsigned char frequency)
 {
   if (channel_index_out_of_bounds(idx)) { return; }
-  if (frequency_out_of_bounds(frequency)) { return; }
+  if (frequency_out_of_bounds(frequency, _sample_rate[idx])) { return; }
   _frequency[idx] = frequency;
 }
 

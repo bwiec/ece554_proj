@@ -29,7 +29,7 @@ class command
 
     bool channel_index_out_of_bounds(unsigned char idx);
     bool sample_rate_out_of_bounds(unsigned char sample_rate);
-    bool frequency_out_of_bounds(unsigned char frequency);
+    bool frequency_out_of_bounds(unsigned char frequency, unsigned char sample_rate);
     bool pattern_illegal(unsigned char pattern);
     bool pattern_specific_out_of_bounds(pattern_t pattern, int pattern_specific);
 

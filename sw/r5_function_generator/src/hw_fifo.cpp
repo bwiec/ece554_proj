@@ -36,7 +36,7 @@ void hw_fifo::xllfifo_init()
 
 void hw_fifo::push(int val)
 {
-	DEBUG_MSG("writing" << val << " to llfifo " << _device_id);
+	DEBUG_MSG("writing " << val << " to llfifo " << _device_id);
 	if (XLlFifo_iTxVacancy(&_xllfifo_inst))
 	{
 		XLlFifo_TxPutWord(&_xllfifo_inst, val);
