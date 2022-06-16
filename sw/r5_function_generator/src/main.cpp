@@ -8,6 +8,9 @@
 #include "wdt.hpp"
 #include "signal_generator.hpp"
 #include "sine_generator.hpp"
+#include "square_generator.hpp"
+#include "triangle_generator.hpp"
+#include "sawtooth_generator.hpp"
 #include "hw_fifo.hpp"
 
 using namespace std;
@@ -44,14 +47,19 @@ int main(int argc, char* argv[])
 	  cmd.set_sample_rate(ii, 200);
 	  cmd.set_frequency(ii, 10);
 	  cmd.set_channel_is_enabled(ii);
-	  cmd.set_pattern(ii, PATTERN_SINE);
+	  cmd.set_pattern(ii, (pattern_t)ii);
 	  cmd.set_pattern_specific(ii, 0);
   }
   signal_generator* waveform_generators[NUM_CHANNELS];
+  for (int ii = 0; ii < NUM_CHANNELS; ii++)
+  {
+	  waveform_generators[ii] = new sine_generator(&cmd, ii); // Set them all to sine to begin with
+  }
 
 
   int n;
   tasks_t cur_task = RELEASE_RESET;
+  pattern_t last_pattern[NUM_CHANNELS];
   while (1)
   {
 	int sample = 0;
@@ -71,7 +79,29 @@ int main(int argc, char* argv[])
         DEBUG_MSG("RECV_CMD state");
         for (int ii = 0; ii < NUM_CHANNELS; ii++)
         {
-        	waveform_generators[ii] = new sine_generator(&cmd, ii);
+        	if (cmd.get_pattern(ii) != last_pattern[ii]) // Only re-allocate pattern if it changed from last time
+        	{
+        		delete waveform_generators[ii]; // De-allocate the old one
+				switch (cmd.get_pattern(ii))
+				{
+					case PATTERN_SINE:
+						waveform_generators[ii] = new sine_generator(&cmd, ii);
+						break;
+					case PATTERN_SQUARE:
+						waveform_generators[ii] = new square_generator(&cmd, ii);
+						break;
+					case PATTERN_TRIANGLE:
+						waveform_generators[ii] = new triangle_generator(&cmd, ii);
+						break;
+					case PATTERN_SAWTOOTH:
+						waveform_generators[ii] = new sawtooth_generator(&cmd, ii);
+						break;
+					default:
+						cerr << "Unsupported pattern" << endl;
+						break;
+				}
+				last_pattern[ii] = cmd.get_pattern(ii);
+        	}
         	cur_task = SEND_RESP;
         }
         break;
@@ -94,7 +124,7 @@ int main(int argc, char* argv[])
         return -1;
     }
 	#ifdef MYDEBUG
-    usleep(100*1000);
+    //usleep(100*1000);
 	#endif
   }
 
