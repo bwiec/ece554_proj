@@ -24,6 +24,48 @@ typedef enum tasks
   SEND_SAMPLES,
 } tasks_t;
 
+void update_patterns(command* cmd, signal_generator* waveform_generators[NUM_CHANNELS])
+{
+	static pattern_t last_pattern[NUM_CHANNELS];
+	for (int ii = 0; ii < NUM_CHANNELS; ii++)
+	{
+		if (cmd->get_pattern(ii) != last_pattern[ii]) // Only re-allocate pattern if it changed from last time
+		{
+			delete waveform_generators[ii]; // De-allocate the old one
+			switch (cmd->get_pattern(ii))
+			{
+				case PATTERN_SINE:
+					waveform_generators[ii] = new sine_generator(cmd, ii);
+					break;
+				case PATTERN_SQUARE:
+					waveform_generators[ii] = new square_generator(cmd, ii);
+					break;
+				case PATTERN_TRIANGLE:
+					waveform_generators[ii] = new triangle_generator(cmd, ii);
+					break;
+				case PATTERN_SAWTOOTH:
+					waveform_generators[ii] = new sawtooth_generator(cmd, ii);
+					break;
+				default:
+					cerr << "Unsupported pattern" << endl;
+					break;
+			}
+			last_pattern[ii] = cmd->get_pattern(ii);
+		}
+	}
+}
+
+void send_samples(signal_generator* waveform_generators[NUM_CHANNELS], hw_fifo* hw_fifos[NUM_CHANNELS])
+{
+	static int n = 0;
+	for (int ii = 0; ii < NUM_CHANNELS; ii++)
+	{
+		int sample = waveform_generators[ii]->calculate_sample(n);
+		hw_fifos[ii]->push(sample);
+	}
+	n++;
+}
+
 int main(int argc, char* argv[])
 {
   cout << "Starting r5_function_generator" << endl;
@@ -60,13 +102,9 @@ int main(int argc, char* argv[])
 	  waveform_generators[ii] = new sine_generator(&cmd, ii); // Set them all to sine to begin with
   }
 
-
-  int n;
   tasks_t cur_task = RELEASE_RESET;
-  pattern_t last_pattern[NUM_CHANNELS];
   while (1)
   {
-	int sample = 0;
     switch(cur_task)
     {
       case RELEASE_RESET:
@@ -81,33 +119,8 @@ int main(int argc, char* argv[])
     	break;
       case RECV_CMD:
         DEBUG_MSG("RECV_CMD state");
-        for (int ii = 0; ii < NUM_CHANNELS; ii++)
-        {
-        	if (cmd.get_pattern(ii) != last_pattern[ii]) // Only re-allocate pattern if it changed from last time
-        	{
-        		delete waveform_generators[ii]; // De-allocate the old one
-				switch (cmd.get_pattern(ii))
-				{
-					case PATTERN_SINE:
-						waveform_generators[ii] = new sine_generator(&cmd, ii);
-						break;
-					case PATTERN_SQUARE:
-						waveform_generators[ii] = new square_generator(&cmd, ii);
-						break;
-					case PATTERN_TRIANGLE:
-						waveform_generators[ii] = new triangle_generator(&cmd, ii);
-						break;
-					case PATTERN_SAWTOOTH:
-						waveform_generators[ii] = new sawtooth_generator(&cmd, ii);
-						break;
-					default:
-						cerr << "Unsupported pattern" << endl;
-						break;
-				}
-				last_pattern[ii] = cmd.get_pattern(ii);
-        	}
-        	cur_task = SEND_RESP;
-        }
+        update_patterns(&cmd, waveform_generators);
+        cur_task = SEND_RESP;
         break;
       case SEND_RESP:
     	DEBUG_MSG("SEND_RESP state");
@@ -115,21 +128,13 @@ int main(int argc, char* argv[])
         break;
       case SEND_SAMPLES:
         DEBUG_MSG("SEND_SAMPLES state");
-        for (int ii = 0; ii < NUM_CHANNELS; ii++)
-        {
-        	sample = waveform_generators[ii]->calculate_sample(n);
-        	hw_fifos[ii]->push(sample);
-        }
-        n++;
+        send_samples(waveform_generators, hw_fifos);
         cur_task = PET_WDT;
         break;
       default:
         cerr << "Unknown task" << endl;
         return -1;
     }
-	#ifdef MYDEBUG
-    //usleep(100*1000);
-	#endif
   }
 
 
