@@ -143,11 +143,11 @@ void command::dump()
 	for (int ii = 0; ii < NUM_CHANNELS; ii++)
 	{
 		cout << "  Channel " << ii << endl;
-		cout << "      _channel_is_enabled: " << _channel_is_enabled;
-		cout << "      _sample_rate: " << _sample_rate[ii];
-		cout << "      _frequency: " << _frequency[ii];
-		cout << "      _pattern: " << _pattern[ii];
-		cout << "      _pattern_specific: " << _pattern_specific[ii];
+		cout << "      _channel_is_enabled: " << (int)_channel_is_enabled << endl;
+		cout << "      _sample_rate: " << (int)_sample_rate[ii] << endl;
+		cout << "      _frequency: " << (int)_frequency[ii] << endl;
+		cout << "      _pattern: " << (int)_pattern[ii] << endl;
+		cout << "      _pattern_specific: " << (int)_pattern_specific[ii] << endl;
 	}
 }
 

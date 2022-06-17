@@ -9,7 +9,7 @@ menu::menu(command* cmd)
 void menu::print()
 {
 	print_header();
-	cout << " --- Main Menu (type a letter followed by enter):" << endl;
+	cout << "--- Main Menu (type a letter followed by enter):" << endl;
 	cout << "c: Channel enable" << endl;
 	cout << "s: Sample Rate" << endl;
 	cout << "f: Frequency" << endl;
@@ -20,6 +20,7 @@ void menu::print()
 
 void menu::print_header()
 {
+	cout << endl;
 	cout << "***********************" << endl;
 	cout << "* ece554_proj - bwiec *" << endl;
 	cout << "***********************" << endl;
@@ -61,7 +62,6 @@ void menu::get_user_input() // This should be a non-blocking function to allow s
 
 char menu::get_character()
 {
-	//return getchar();
 	char c;
 	cin >> c;
 	return c;
@@ -70,20 +70,9 @@ char menu::get_character()
 unsigned int menu::get_number(int max_digits)
 {
 	DEBUG_MSG("Getting number");
-	char digits[32];
-	int digit_idx = 0;
-	char c = get_character();
-	while (c != '\n')
-	{
-		if (digit_idx > max_digits)
-		{
-			break;
-		}
-		digits[digit_idx] = c - '0';
-		c = get_character();
-	}
-	unsigned char val = 0;
-	sprintf(digits, "%d", (int)val);
+	unsigned int val;
+	cin >> val;
+	cout << val << endl;
 
 	DEBUG_MSG("val: " << val);
 	DEBUG_MSG("Done getting number");
