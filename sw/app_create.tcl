@@ -22,6 +22,8 @@ if {${app_name} == "r5_ui"} {
 
 app create -name ${app_name} \
   -platform ${platform_name} \
+  -domain ${app_name}_dom \
+  -sysproj ${app_name}_system \
   -proc psu_cortexr5_${r5_core_num} \
   -os standalone -lang C++ -template {Empty Application (C++)}
 

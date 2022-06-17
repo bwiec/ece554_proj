@@ -9,7 +9,7 @@ using namespace std;
 class reset
 {
   private:
-    gpio _gpio_inst;
+    gpio _gpio;
 
   public:
     reset(int device_id);

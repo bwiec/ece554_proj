@@ -1,22 +1,22 @@
 #include "tasks.hpp"
 
 tasks::tasks(device_ids_t* device_ids) :
-	_wdt_inst(device_ids->wdt_gpio),
-	_reset_inst(device_ids->reset_gpio),
-	_sample_rate_gpio_inst(device_ids->sample_rate_gpio), // Single sample period controls all channels for now
-	_hw_fifo0_inst(device_ids->hw_fifo0),
-	_hw_fifo1_inst(device_ids->hw_fifo1),
-	_hw_fifo2_inst(device_ids->hw_fifo2),
-	_hw_fifo3_inst(device_ids->hw_fifo3)
+	_wdt(device_ids->wdt_gpio),
+	_reset(device_ids->reset_gpio),
+	_sample_rate_gpio(device_ids->sample_rate_gpio), // Single sample period controls all channels for now
+	_hw_fifo0(device_ids->hw_fifo0),
+	_hw_fifo1(device_ids->hw_fifo1),
+	_hw_fifo2(device_ids->hw_fifo2),
+	_hw_fifo3(device_ids->hw_fifo3)
 {
 	_n = 0;
-	_hw_fifos[0] = &_hw_fifo0_inst;
-	_hw_fifos[1] = &_hw_fifo1_inst;
-	_hw_fifos[2] = &_hw_fifo2_inst;
-	_hw_fifos[3] = &_hw_fifo3_inst;
-	_sample_rate_gpio_inst.write(2*1000*1000);
+	_hw_fifos[0] = &_hw_fifo0;
+	_hw_fifos[1] = &_hw_fifo1;
+	_hw_fifos[2] = &_hw_fifo2;
+	_hw_fifos[3] = &_hw_fifo3;
 
 	// Dummy command for now
+	_sample_rate_gpio.write(2*1000*1000);
 	for (int ii = 0; ii < NUM_CHANNELS; ii++)
 	{
 		_cmd.set_sample_rate(ii, 200);
@@ -44,12 +44,12 @@ void tasks::run()
 		{
 		  case RELEASE_RESET:
 			DEBUG_MSG("RELEASE_RESET state");
-			_reset_inst.deassert();
+			_reset.deassert();
 			cur_state = PET_WDT;
 			break;
 		  case PET_WDT:
 			DEBUG_MSG("PET_WDT state");
-			_wdt_inst.pet();
+			_wdt.pet();
 			cur_state = RECV_CMD;
 			break;
 		  case RECV_CMD:

@@ -52,5 +52,7 @@ class command
     void set_pattern_specific(unsigned char idx, int _pattern_specific);
     int get_pattern_specific(unsigned char idx);
 
+    void dump();
+
     ~command();
 };

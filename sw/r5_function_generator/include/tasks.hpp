@@ -39,13 +39,13 @@ class tasks
   private:
 	int _n;
 	command _cmd;
-	wdt _wdt_inst;
-	reset _reset_inst;
-	gpio _sample_rate_gpio_inst; // Single sample period controls all channels for now
-	hw_fifo _hw_fifo0_inst;
-	hw_fifo _hw_fifo1_inst;
-	hw_fifo _hw_fifo2_inst;
-	hw_fifo _hw_fifo3_inst;
+	wdt _wdt;
+	reset _reset;
+	gpio _sample_rate_gpio; // Single sample period controls all channels for now
+	hw_fifo _hw_fifo0;
+	hw_fifo _hw_fifo1;
+	hw_fifo _hw_fifo2;
+	hw_fifo _hw_fifo3;
 	hw_fifo* _hw_fifos[NUM_CHANNELS];
 	signal_generator* _waveform_generators[NUM_CHANNELS];
 	

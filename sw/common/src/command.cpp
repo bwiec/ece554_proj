@@ -137,6 +137,20 @@ int command::get_pattern_specific(unsigned char idx)
   return _pattern_specific[idx];
 }
 
+void command::dump()
+{
+	cout << "***** Command *****" << endl;
+	for (int ii = 0; ii < NUM_CHANNELS; ii++)
+	{
+		cout << "  Channel " << ii << endl;
+		cout << "      _channel_is_enabled: " << _channel_is_enabled;
+		cout << "      _sample_rate: " << _sample_rate[ii];
+		cout << "      _frequency: " << _frequency[ii];
+		cout << "      _pattern: " << _pattern[ii];
+		cout << "      _pattern_specific: " << _pattern_specific[ii];
+	}
+}
+
 command::~command()
 {
 

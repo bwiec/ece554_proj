@@ -17,18 +17,18 @@ void hw_fifo::xllfifo_init()
 		cerr << "No llfifo configuration found for " << _device_id;
 	}
 	
-	int status = XLlFifo_CfgInitialize(&_xllfifo_inst, cfg, cfg->BaseAddress);
+	int status = XLlFifo_CfgInitialize(&_xllfifo, cfg, cfg->BaseAddress);
 	if (status != XST_SUCCESS)
 	{
 		cerr << "Initialization of llfifo failed for " << _device_id;
 	}
 	
-	status = XLlFifo_Status(&_xllfifo_inst);
-	XLlFifo_IntClear(&_xllfifo_inst, 0xFFFFFFFF);
-	status = XLlFifo_Status(&_xllfifo_inst);
+	status = XLlFifo_Status(&_xllfifo);
+	XLlFifo_IntClear(&_xllfifo, 0xFFFFFFFF);
+	status = XLlFifo_Status(&_xllfifo);
 	if (status != 0x0)
 	{
-		cerr << "For " << _device_id << ", reset value of ISR0: " << XLlFifo_Status(&_xllfifo_inst) << ", expected: 0x0" << endl;
+		cerr << "For " << _device_id << ", reset value of ISR0: " << XLlFifo_Status(&_xllfifo) << ", expected: 0x0" << endl;
 	}
 	
 	DEBUG_MSG("llfifo_init() complete for " << _device_id);
@@ -37,11 +37,11 @@ void hw_fifo::xllfifo_init()
 void hw_fifo::push(int val)
 {
 	DEBUG_MSG("writing " << val << " to llfifo " << _device_id);
-	if (XLlFifo_iTxVacancy(&_xllfifo_inst))
+	if (XLlFifo_iTxVacancy(&_xllfifo))
 	{
-		XLlFifo_TxPutWord(&_xllfifo_inst, val);
-		XLlFifo_iTxSetLen(&_xllfifo_inst, 4);
-		while (!(XLlFifo_IsTxDone(&_xllfifo_inst)));
+		XLlFifo_TxPutWord(&_xllfifo, val);
+		XLlFifo_iTxSetLen(&_xllfifo, 4);
+		while (!(XLlFifo_IsTxDone(&_xllfifo)));
 	}
 	else
 	{

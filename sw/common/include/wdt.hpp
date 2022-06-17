@@ -9,7 +9,7 @@ using namespace std;
 class wdt
 {
   private:
-    gpio _gpio_inst;
+    gpio _gpio;
 
   public:
     wdt(int device_id);
