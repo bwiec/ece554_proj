@@ -1,9 +1,5 @@
 #include <iostream>
-#include <queue>
 #include "xparameters.h"
-#include "sleep.h"
-#include "debug.hpp"
-#include "message_queue.hpp"
 #include "tasks.hpp"
 
 using namespace std;

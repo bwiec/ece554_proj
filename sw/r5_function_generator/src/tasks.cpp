@@ -54,11 +54,22 @@ void tasks::run()
 			break;
 		  case RECV_CMD:
 			DEBUG_MSG("RECV_CMD state");
+			for (int ii = 0; ii < NUM_CHANNELS; ii++)
+			{
+				if (_cmd_queue.pop())
+				{
+					_cmd.set_channel_is_enabled(ii);
+				}
+				else
+				{
+					_cmd.clr_channel_is_enabled(ii);
+				}
+				_cmd.set_sample_rate(ii, (unsigned char)_cmd_queue.pop());
+				_cmd.set_frequency(ii, (unsigned char)_cmd_queue.pop());
+				_cmd.set_pattern(ii, (pattern_t)_cmd_queue.pop());
+				_cmd.set_pattern_specific(ii, _cmd_queue.pop());
+			}
 			update_patterns();
-			cur_state = SEND_RESP;
-			break;
-		  case SEND_RESP:
-			DEBUG_MSG("SEND_RESP state");
 			cur_state = SEND_SAMPLES;
 			break;
 		  case SEND_SAMPLES:

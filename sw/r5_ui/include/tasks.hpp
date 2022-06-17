@@ -3,6 +3,7 @@
 #include <iostream>
 #include "debug.hpp"
 #include "menu.hpp"
+#include "message_queue.hpp"
 
 using namespace std;
 
@@ -24,6 +25,7 @@ class tasks
 	private:
 		command _cmd;
 		menu _menu;
+		message_queue _cmd_queue;
 	
 	public:
 		tasks(device_ids_t* device_ids);

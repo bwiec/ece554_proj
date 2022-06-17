@@ -37,6 +37,14 @@ void tasks::run()
 				break;
 			case SEND_CMD:
 				DEBUG_MSG("SEND_CMD state");
+				for (int ii = 0; ii < NUM_CHANNELS; ii++)
+				{
+					_cmd_queue.push((int)_cmd.get_channel_is_enabled(ii));
+					_cmd_queue.push((int)_cmd.get_sample_rate(ii));
+					_cmd_queue.push((int)_cmd.get_frequency(ii));
+					_cmd_queue.push((int)_cmd.get_pattern(ii));
+					_cmd_queue.push((int)_cmd.get_pattern_specific(ii));
+				}
 				cur_state = PET_WDT;
 				break;
 			default:
