@@ -89,8 +89,8 @@ unsigned char menu::submenu_channel_select()
 
 void menu::submenu_channel_enable()
 {
-	cout << "--- Channel Enable Menu (type a number from 0 to 4 to toggle channel enable): " << endl;
-	char c = get_character();
+	cout << "--- Channel Enable Menu (type a number from 0 to 3 to toggle channel enable): " << endl;
+	unsigned char c = get_character();
 	unsigned char idx = c - '0';
 	if (_cmd->get_channel_is_enabled(idx))
 	{

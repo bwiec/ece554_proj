@@ -14,7 +14,7 @@ command::command()
 
 bool command::channel_index_out_of_bounds(unsigned char idx)
 {
-  if (idx < 0 || idx > NUM_CHANNELS)
+  if (idx < 0 || idx > NUM_CHANNELS-1)
   {
     cerr << "ERROR! Illegal channel index " << idx << endl;
     return true;
@@ -143,7 +143,9 @@ void command::dump()
 	for (int ii = 0; ii < NUM_CHANNELS; ii++)
 	{
 		cout << "  Channel " << ii << endl;
-		cout << "      _channel_is_enabled: " << (int)_channel_is_enabled << endl;
+		string ch_is_enabled;
+		ch_is_enabled = ((int)_channel_is_enabled & (1<<ii)) ? "true" : "false";
+		cout << "      _channel_is_enabled: " << ch_is_enabled << endl;
 		cout << "      _sample_rate: " << (int)_sample_rate[ii] << endl;
 		cout << "      _frequency: " << (int)_frequency[ii] << endl;
 		cout << "      _pattern: " << (int)_pattern[ii] << endl;

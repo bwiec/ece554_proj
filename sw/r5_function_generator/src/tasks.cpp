@@ -19,7 +19,7 @@ tasks::tasks(device_ids_t* device_ids) :
 	_sample_rate_gpio.write(2*1000*1000);
 	for (int ii = 0; ii < NUM_CHANNELS; ii++)
 	{
-		_cmd.set_channel_is_enabled(ii);
+		_cmd.clr_channel_is_enabled(ii);
 		_cmd.set_sample_rate(ii, (unsigned char)200);
 		_cmd.set_frequency(ii, (unsigned char)10);
 		_cmd.set_pattern(ii, (pattern_t)ii);
@@ -123,7 +123,11 @@ void tasks::send_samples()
 {
 	for (int ii = 0; ii < NUM_CHANNELS; ii++)
 	{
-		int sample = _waveform_generators[ii]->calculate_sample(_n);
+		int sample = 0;
+		if (_cmd.get_channel_is_enabled(ii))
+		{
+			sample = _waveform_generators[ii]->calculate_sample(_n);
+		}
 		_hw_fifos[ii]->push(sample);
 	}
 	_n++;

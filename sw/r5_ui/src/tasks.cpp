@@ -6,7 +6,7 @@ tasks::tasks(device_ids_t* device_ids) :
 	// Dummy command for now
 	for (int ii = 0; ii < NUM_CHANNELS; ii++)
 	{
-		_cmd.set_channel_is_enabled(ii);
+		_cmd.clr_channel_is_enabled((unsigned char)ii);
 		_cmd.set_sample_rate(ii, (unsigned char)200);
 		_cmd.set_frequency(ii, (unsigned char)10);
 		_cmd.set_pattern(ii, (pattern_t)ii);
