@@ -19,25 +19,26 @@ tasks::tasks(device_ids_t* device_ids) :
 	_sample_rate_gpio.write(2*1000*1000);
 	for (int ii = 0; ii < NUM_CHANNELS; ii++)
 	{
-		_cmd.set_sample_rate(ii, 200);
-		_cmd.set_frequency(ii, 10);
 		_cmd.set_channel_is_enabled(ii);
+		_cmd.set_sample_rate(ii, (unsigned char)200);
+		_cmd.set_frequency(ii, (unsigned char)10);
 		_cmd.set_pattern(ii, (pattern_t)ii);
 		_cmd.set_pattern_specific(ii, 0);
 	}
-	_cmd.set_frequency(1, 2);
-	_cmd.set_frequency(2, 2);
-	_cmd.set_frequency(3, 2);
+	_cmd.set_frequency(1, (unsigned char)2);
+	_cmd.set_frequency(2, (unsigned char)2);
+	_cmd.set_frequency(3, (unsigned char)2);
 
-	for (int ii = 0; ii < NUM_CHANNELS; ii++)
-	{
-		_waveform_generators[ii] = new sine_generator(&_cmd, ii); // Set them all to sine to begin with
-	}
+	_waveform_generators[0] = new sine_generator(&_cmd, 0);
+	_waveform_generators[1] = new square_generator(&_cmd, 1);
+	_waveform_generators[2] = new triangle_generator(&_cmd, 2);
+	_waveform_generators[3] = new sawtooth_generator(&_cmd, 3);
 }
 
 void tasks::run()
 {
 	states_t cur_state = RELEASE_RESET;
+	int buf[MAILBOX_MAX_LENGTH_WORDS];
 	  while (1)
 	  {
 		switch(cur_state)
@@ -54,22 +55,25 @@ void tasks::run()
 			break;
 		  case RECV_CMD:
 			DEBUG_MSG("RECV_CMD state");
-			for (int ii = 0; ii < NUM_CHANNELS; ii++)
+			if (_cmd_mailbox.pop(buf, 5*NUM_CHANNELS))
 			{
-				if (_cmd_queue.pop())
+				for (int ii = 0; ii < NUM_CHANNELS; ii++)
 				{
-					_cmd.set_channel_is_enabled(ii);
+					if (buf[ii*5+0])
+					{
+						_cmd.set_channel_is_enabled(ii);
+					}
+					else
+					{
+						_cmd.clr_channel_is_enabled(ii);
+					}
+					_cmd.set_sample_rate(ii, (unsigned char)buf[ii*5+1]);
+					_cmd.set_frequency(ii, (unsigned char)buf[ii*5+2]);
+					_cmd.set_pattern(ii, (pattern_t)buf[ii*5+3]);
+					_cmd.set_pattern_specific(ii, buf[ii*5+4]);
 				}
-				else
-				{
-					_cmd.clr_channel_is_enabled(ii);
-				}
-				_cmd.set_sample_rate(ii, (unsigned char)_cmd_queue.pop());
-				_cmd.set_frequency(ii, (unsigned char)_cmd_queue.pop());
-				_cmd.set_pattern(ii, (pattern_t)_cmd_queue.pop());
-				_cmd.set_pattern_specific(ii, _cmd_queue.pop());
+				update_patterns();
 			}
-			update_patterns();
 			cur_state = SEND_SAMPLES;
 			break;
 		  case SEND_SAMPLES:
@@ -86,7 +90,7 @@ void tasks::run()
 
 void tasks::update_patterns()
 {
-	static pattern_t last_pattern[NUM_CHANNELS];
+	static pattern_t last_pattern[NUM_CHANNELS] = {(pattern_t)-1, (pattern_t)-1, (pattern_t)-1, (pattern_t)-1};
 	for (int ii = 0; ii < NUM_CHANNELS; ii++)
 	{
 		if (_cmd.get_pattern(ii) != last_pattern[ii]) // Only re-allocate pattern if it changed from last time

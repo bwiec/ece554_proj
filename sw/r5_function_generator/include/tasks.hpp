@@ -11,7 +11,7 @@
 #include "triangle_generator.hpp"
 #include "sawtooth_generator.hpp"
 #include "hw_fifo.hpp"
-#include "message_queue.hpp"
+#include "mailbox.hpp"
 
 using namespace std;
 
@@ -48,7 +48,7 @@ class tasks
 	hw_fifo _hw_fifo3;
 	hw_fifo* _hw_fifos[NUM_CHANNELS];
 	signal_generator* _waveform_generators[NUM_CHANNELS];
-	message_queue _cmd_queue;
+	mailbox _cmd_mailbox;
 	
 	void update_patterns();
 	void send_samples();
