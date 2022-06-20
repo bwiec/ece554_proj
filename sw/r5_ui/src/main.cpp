@@ -12,6 +12,7 @@ int main(int argc, char* argv[])
 	{
 		XPAR_AXI_GPIO_0_DEVICE_ID,
 	};
+
 	tasks tasks_inst(&device_ids_inst);
 	tasks_inst.run();
 

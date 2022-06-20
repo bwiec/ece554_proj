@@ -1,4 +1,5 @@
 #include "tasks.hpp"
+#include "sleep.h"
 
 tasks::tasks(device_ids_t* device_ids) :
 	_wdt(device_ids->wdt_gpio),
@@ -50,7 +51,7 @@ void tasks::run()
 			break;
 		  case PET_WDT:
 			DEBUG_MSG("PET_WDT state");
-			_wdt.pet();
+			_wdt.pet(); sleep(10);
 			cur_state = RECV_CMD;
 			break;
 		  case RECV_CMD:
