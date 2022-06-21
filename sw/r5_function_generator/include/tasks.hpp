@@ -50,6 +50,9 @@ class tasks
 	signal_generator* _waveform_generators[NUM_CHANNELS];
 	mailbox _cmd_mailbox;
 	
+	void release_reset();
+	void pet_wdt();
+	void recv_cmd();
 	void update_patterns();
 	void send_samples();
 

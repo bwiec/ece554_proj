@@ -47,67 +47,82 @@ tasks::tasks(device_ids_t* device_ids) :
 void tasks::run()
 {
 	states_t cur_state = RELEASE_RESET;
-	int buf[MAILBOX_MAX_LENGTH_WORDS];
-	  while (1)
-	  {
+	while (1)
+	{
 		switch(cur_state)
 		{
-		  case RELEASE_RESET:
-			DEBUG_MSG("RELEASE_RESET state");
-			_reset.deassert();
-			cur_state = PET_WDT;
-			break;
-		  case PET_WDT:
-			DEBUG_MSG("PET_WDT state");
-			if (_cmd.get_test_wdt())
-			{
-				_cmd.clr_test_wdt();
-				sleep(1);
-			}
-			_wdt.pet();
-			cur_state = RECV_CMD;
-			break;
-		  case RECV_CMD:
-			DEBUG_MSG("RECV_CMD state");
-			if (_cmd_mailbox.pop(buf, 5*NUM_CHANNELS+1))
-			{
-				for (int ii = 0; ii < NUM_CHANNELS; ii++)
-				{
-					if (buf[ii*5+0])
-					{
-						_cmd.set_channel_is_enabled(ii);
-					}
-					else
-					{
-						_cmd.clr_channel_is_enabled(ii);
-					}
-					_cmd.set_sample_rate(ii, (unsigned char)buf[ii*5+1]);
-					_cmd.set_frequency(ii, (unsigned char)buf[ii*5+2]);
-					_cmd.set_pattern(ii, (pattern_t)buf[ii*5+3]);
-					_cmd.set_pattern_specific(ii, buf[ii*5+4]);
-				}
-				if (buf[(NUM_CHANNELS-1)*5+4+1])
-				{
-					_cmd.set_test_wdt();
-				}
-				else
-				{
-					_cmd.clr_test_wdt();
-				}
-				update_patterns();
-			}
-			cur_state = SEND_SAMPLES;
-			break;
-		  case SEND_SAMPLES:
-			DEBUG_MSG("SEND_SAMPLES state");
-			send_samples();
-			cur_state = PET_WDT;
-			break;
-		  default:
-			cerr << "Unknown task" << endl;
-			return;
+			case RELEASE_RESET:
+				DEBUG_MSG("RELEASE_RESET state");
+				release_reset();
+				cur_state = PET_WDT;
+				break;
+			case PET_WDT:
+				DEBUG_MSG("PET_WDT state");
+				pet_wdt();
+				cur_state = RECV_CMD;
+				break;
+			case RECV_CMD:
+				DEBUG_MSG("RECV_CMD state");
+				recv_cmd();
+				cur_state = SEND_SAMPLES;
+				break;
+			case SEND_SAMPLES:
+				DEBUG_MSG("SEND_SAMPLES state");
+				send_samples();
+				cur_state = PET_WDT;
+				break;
+			default:
+				cerr << "Unknown task" << endl;
+				return;
 		}
-	  }
+	}
+}
+
+void tasks::release_reset()
+{
+	_reset.deassert();
+}
+
+void tasks::pet_wdt()
+{
+	if (_cmd.get_test_wdt())
+	{
+		_cmd.clr_test_wdt();
+		sleep(1);
+	}
+	_wdt.pet();
+}
+
+void tasks::recv_cmd()
+{
+	int buf[MAILBOX_MAX_LENGTH_WORDS];
+	if (_cmd_mailbox.pop(buf, 5*NUM_CHANNELS+1))
+	{
+		for (int ii = 0; ii < NUM_CHANNELS; ii++)
+		{
+			if (buf[ii*5+0])
+			{
+				_cmd.set_channel_is_enabled(ii);
+			}
+			else
+			{
+				_cmd.clr_channel_is_enabled(ii);
+			}
+			_cmd.set_sample_rate(ii, (unsigned char)buf[ii*5+1]);
+			_cmd.set_frequency(ii, (unsigned char)buf[ii*5+2]);
+			_cmd.set_pattern(ii, (pattern_t)buf[ii*5+3]);
+			_cmd.set_pattern_specific(ii, buf[ii*5+4]);
+		}
+		if (buf[(NUM_CHANNELS-1)*5+4+1])
+		{
+			_cmd.set_test_wdt();
+		}
+		else
+		{
+			_cmd.clr_test_wdt();
+		}
+		update_patterns();
+	}
 }
 
 void tasks::update_patterns()
