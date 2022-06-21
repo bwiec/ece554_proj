@@ -1,5 +1,6 @@
 #include "tasks.hpp"
-#include "sleep.h"
+
+#define PRINT_INTERVAL 5000
 
 static void wdt_isr(void* data)
 {
@@ -16,7 +17,8 @@ tasks::tasks(device_ids_t* device_ids) :
 	_hw_fifo0(device_ids->hw_fifo0),
 	_hw_fifo1(device_ids->hw_fifo1),
 	_hw_fifo2(device_ids->hw_fifo2),
-	_hw_fifo3(device_ids->hw_fifo3)
+	_hw_fifo3(device_ids->hw_fifo3),
+	_timer(device_ids->timer_ttc)
 {
 	_n = 0;
 	_hw_fifos[0] = &_hw_fifo0;
@@ -47,33 +49,47 @@ tasks::tasks(device_ids_t* device_ids) :
 void tasks::run()
 {
 	states_t cur_state = RELEASE_RESET;
+	int trip_cnt = 0;
 	while (1)
 	{
 		switch(cur_state)
 		{
 			case RELEASE_RESET:
+				_timer.start();
 				DEBUG_MSG("RELEASE_RESET state");
 				release_reset();
+				task_times[RELEASE_RESET] = _timer.stop();
 				cur_state = PET_WDT;
 				break;
 			case PET_WDT:
+				_timer.start();
 				DEBUG_MSG("PET_WDT state");
 				pet_wdt();
+				task_times[PET_WDT] = _timer.stop();
 				cur_state = RECV_CMD;
 				break;
 			case RECV_CMD:
+				_timer.start();
 				DEBUG_MSG("RECV_CMD state");
 				recv_cmd();
+				task_times[RECV_CMD] = _timer.stop();
 				cur_state = SEND_SAMPLES;
 				break;
 			case SEND_SAMPLES:
+				_timer.start();
 				DEBUG_MSG("SEND_SAMPLES state");
 				send_samples();
+				task_times[SEND_SAMPLES] = _timer.stop();
 				cur_state = PET_WDT;
 				break;
 			default:
 				cerr << "Unknown task" << endl;
 				return;
+		}
+		if (trip_cnt++ > PRINT_INTERVAL)
+		{
+			print_task_times();
+			trip_cnt = 0;
 		}
 	}
 }
@@ -168,6 +184,22 @@ void tasks::send_samples()
 		_hw_fifos[ii]->push(sample);
 	}
 	_n++;
+}
+
+void tasks::print_task_times()
+{
+	float total = 0;
+	cout << endl;
+	cout << "--- Task times ---" << endl;
+	for (int ii = 0; ii < NUM_STATES; ii++)
+	{
+		cout << "  State " << ii << ": " << task_times[ii]*1000 << "us" << endl;
+		total += task_times[ii];
+	}
+	cout << "------------------" << endl;
+	cout << "  total: " << total*1000 << "us" << endl;
+	cout << "------------------" << endl;
+	cout << endl;
 }
 
 tasks::~tasks()

@@ -15,6 +15,7 @@ int main(int argc, char* argv[])
 		XPAR_AXI_FIFO_MM_S_1_DEVICE_ID,
 		XPAR_AXI_FIFO_MM_S_2_DEVICE_ID,
 		XPAR_AXI_FIFO_MM_S_3_DEVICE_ID,
+		XPAR_PSU_TTC_0_DEVICE_ID
 	};
 
 	tasks tasks_inst(&_device_ids);

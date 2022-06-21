@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include "sleep.h"
 #include "debug.hpp"
 #include "gpio.hpp"
 #include "reset.hpp"
@@ -12,6 +13,7 @@
 #include "sawtooth_generator.hpp"
 #include "hw_fifo.hpp"
 #include "mailbox.hpp"
+#include "timer.hpp"
 
 using namespace std;
 
@@ -24,6 +26,7 @@ typedef struct device_ids
 	int hw_fifo1 = 0;
 	int hw_fifo2 = 0;
 	int hw_fifo3 = 0;
+	int timer_ttc = 0;
 } device_ids_t;
 
 typedef enum states
@@ -32,6 +35,7 @@ typedef enum states
   PET_WDT,
   RECV_CMD,
   SEND_SAMPLES,
+  NUM_STATES
 } states_t;
 
 class tasks
@@ -49,12 +53,15 @@ class tasks
 	hw_fifo* _hw_fifos[NUM_CHANNELS];
 	signal_generator* _waveform_generators[NUM_CHANNELS];
 	mailbox _cmd_mailbox;
+	timer _timer;
+	float task_times[NUM_STATES];
 	
 	void release_reset();
 	void pet_wdt();
 	void recv_cmd();
 	void update_patterns();
 	void send_samples();
+	void print_task_times();
 
   public:
 	tasks(device_ids_t* device_ids);
