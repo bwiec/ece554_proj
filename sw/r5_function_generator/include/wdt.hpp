@@ -12,10 +12,10 @@ class wdt
   private:
     gpio _gpio;
     XScuGic _gic;
-    int gic_init();
+    int gic_init(void (*isr)(void* data));
 
   public:
-    wdt(int device_id);
+    wdt(int device_id, void (*isr)(void* data));
     void pet();
     ~wdt();
 };

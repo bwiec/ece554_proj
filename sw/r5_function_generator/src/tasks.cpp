@@ -1,8 +1,14 @@
 #include "tasks.hpp"
 #include "sleep.h"
 
+static void wdt_isr(void* data)
+{
+	cout << "WDT expired... resetting" << endl;
+	while(1);
+}
+
 tasks::tasks(device_ids_t* device_ids) :
-	_wdt(device_ids->wdt_gpio),
+	_wdt(device_ids->wdt_gpio, &wdt_isr),
 	_reset(device_ids->reset_gpio),
 	_sample_rate_gpio(device_ids->sample_rate_gpio), // Single sample period controls all channels for now
 	_hw_fifo0(device_ids->hw_fifo0),
