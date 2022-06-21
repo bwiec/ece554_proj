@@ -10,6 +10,7 @@ command::command()
     _pattern[ii] = (unsigned char)PATTERN_SINE;
     _pattern_specific[ii] = 0;
   }
+  _test_wdt = 0;
 }
 
 bool command::channel_index_out_of_bounds(unsigned char idx)
@@ -137,6 +138,21 @@ int command::get_pattern_specific(unsigned char idx)
   return _pattern_specific[idx];
 }
 
+void command::set_test_wdt()
+{
+	_test_wdt = 1;
+}
+
+void command::clr_test_wdt()
+{
+	_test_wdt = 0;
+}
+
+int command::get_test_wdt()
+{
+	return _test_wdt;
+}
+
 void command::dump()
 {
 	cout << "***** Command *****" << endl;
@@ -150,6 +166,7 @@ void command::dump()
 		cout << "      _frequency: " << (int)_frequency[ii] << endl;
 		cout << "      _pattern: " << (int)_pattern[ii] << endl;
 		cout << "      _pattern_specific: " << (int)_pattern_specific[ii] << endl;
+		cout << "      test_wdt: " << (int)_test_wdt << endl;
 	}
 }
 

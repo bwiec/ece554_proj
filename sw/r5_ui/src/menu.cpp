@@ -15,6 +15,7 @@ void menu::print()
 	cout << "f: Frequency" << endl;
 	cout << "p: Pattern" << endl;
 	cout << "m: Misc (pattern-specific)" << endl;
+	cout << "t: Test watch dog timer" << endl;
 	cout << "q: Quit" << endl;
 }
 
@@ -52,6 +53,10 @@ void menu::get_user_input() // This should be a non-blocking function to allow s
 	else if (c == 'm')
 	{
 		submenu_misc();
+	}
+	else if (c == 't')
+	{
+		_cmd->set_test_wdt();
 	}
 	else
 	{

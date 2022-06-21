@@ -51,12 +51,17 @@ void tasks::run()
 			break;
 		  case PET_WDT:
 			DEBUG_MSG("PET_WDT state");
-			_wdt.pet(); sleep(10);
+			_wdt.pet();
+			if (_cmd.get_test_wdt())
+			{
+				sleep(10);
+				_cmd.clr_test_wdt();
+			}
 			cur_state = RECV_CMD;
 			break;
 		  case RECV_CMD:
 			DEBUG_MSG("RECV_CMD state");
-			if (_cmd_mailbox.pop(buf, 5*NUM_CHANNELS))
+			if (_cmd_mailbox.pop(buf, 5*NUM_CHANNELS+1))
 			{
 				for (int ii = 0; ii < NUM_CHANNELS; ii++)
 				{
@@ -72,6 +77,14 @@ void tasks::run()
 					_cmd.set_frequency(ii, (unsigned char)buf[ii*5+2]);
 					_cmd.set_pattern(ii, (pattern_t)buf[ii*5+3]);
 					_cmd.set_pattern_specific(ii, buf[ii*5+4]);
+				}
+				if (buf[(NUM_CHANNELS-1)*5+4+1])
+				{
+					_cmd.set_test_wdt();
+				}
+				else
+				{
+					_cmd.clr_test_wdt();
 				}
 				update_patterns();
 			}

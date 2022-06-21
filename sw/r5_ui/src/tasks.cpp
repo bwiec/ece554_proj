@@ -27,6 +27,10 @@ void tasks::run()
 		{
 			case PET_WDT:
 				DEBUG_MSG("PET_WDT state");
+				if (_cmd.get_test_wdt()) // Clear after test is done so other CPU comes out of wdt_test state
+				{
+					_cmd.clr_test_wdt();
+				}
 				cur_state = GET_CMD;
 				break;
 			case GET_CMD:
@@ -46,7 +50,8 @@ void tasks::run()
 					buf[ii*5+3] = (int)_cmd.get_pattern(ii);
 					buf[ii*5+4] = (int)_cmd.get_pattern_specific(ii);
 				}
-				_cmd_mailbox.push(buf, NUM_CHANNELS*5);
+				buf[(NUM_CHANNELS-1)*5+4+1] = _cmd.get_test_wdt();
+				_cmd_mailbox.push(buf, NUM_CHANNELS*5+1);
 				cur_state = PET_WDT;
 				break;
 			default:
@@ -55,7 +60,6 @@ void tasks::run()
 		}
 	}
 }
-
 
 tasks::~tasks()
 {
