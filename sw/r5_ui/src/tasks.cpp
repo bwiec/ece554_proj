@@ -15,6 +15,8 @@ tasks::tasks(device_ids_t* device_ids) :
 	_cmd.set_frequency(1, (unsigned char)2);
 	_cmd.set_frequency(2, (unsigned char)2);
 	_cmd.set_frequency(3, (unsigned char)2);
+	_cmd.clr_test_wdt();
+	_cmd.set_print_times();
 }
 
 void tasks::run()
@@ -52,6 +54,11 @@ void tasks::pet_wdt()
 	{
 		_cmd.clr_test_wdt();
 	}
+
+	if (_cmd.get_print_times())
+	{
+		_cmd.clr_print_times();
+	}
 }
 
 void tasks::get_cmd()
@@ -73,7 +80,8 @@ void tasks::send_cmd()
 		buf[ii*5+4] = (int)_cmd.get_pattern_specific(ii);
 	}
 	buf[(NUM_CHANNELS-1)*5+4+1] = _cmd.get_test_wdt();
-	_cmd_mailbox.push(buf, NUM_CHANNELS*5+1);
+	buf[(NUM_CHANNELS-1)*5+4+2] = _cmd.get_print_times();
+	_cmd_mailbox.push(buf, NUM_CHANNELS*5+2);
 }
 tasks::~tasks()
 {

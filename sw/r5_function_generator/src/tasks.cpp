@@ -1,7 +1,5 @@
 #include "tasks.hpp"
 
-#define PRINT_INTERVAL 5000
-
 static void wdt_isr(void* data)
 {
 	cout << "WDT expired... resetting" << endl;
@@ -39,6 +37,8 @@ tasks::tasks(device_ids_t* device_ids) :
 	_cmd.set_frequency(1, (unsigned char)2);
 	_cmd.set_frequency(2, (unsigned char)2);
 	_cmd.set_frequency(3, (unsigned char)2);
+	_cmd.clr_test_wdt();
+	_cmd.clr_print_times();
 
 	_waveform_generators[0] = new sine_generator(&_cmd, 0);
 	_waveform_generators[1] = new square_generator(&_cmd, 1);
@@ -49,7 +49,6 @@ tasks::tasks(device_ids_t* device_ids) :
 void tasks::run()
 {
 	states_t cur_state = RELEASE_RESET;
-	int trip_cnt = 0;
 	while (1)
 	{
 		switch(cur_state)
@@ -86,11 +85,6 @@ void tasks::run()
 				cerr << "Unknown task" << endl;
 				return;
 		}
-		if (trip_cnt++ > PRINT_INTERVAL)
-		{
-			print_task_times();
-			trip_cnt = 0;
-		}
 	}
 }
 
@@ -107,12 +101,17 @@ void tasks::pet_wdt()
 		sleep(1);
 	}
 	_wdt.pet();
+	if (_cmd.get_print_times())
+	{
+		_cmd.clr_print_times();
+		print_task_times();
+	}
 }
 
 void tasks::recv_cmd()
 {
 	int buf[MAILBOX_MAX_LENGTH_WORDS];
-	if (_cmd_mailbox.pop(buf, 5*NUM_CHANNELS+1))
+	if (_cmd_mailbox.pop(buf, 5*NUM_CHANNELS+2))
 	{
 		for (int ii = 0; ii < NUM_CHANNELS; ii++)
 		{
@@ -136,6 +135,14 @@ void tasks::recv_cmd()
 		else
 		{
 			_cmd.clr_test_wdt();
+		}
+		if (buf[(NUM_CHANNELS-1)*5+4+2])
+		{
+			_cmd.set_print_times();
+		}
+		else
+		{
+			_cmd.clr_print_times();
 		}
 		update_patterns();
 	}
@@ -189,6 +196,7 @@ void tasks::send_samples()
 void tasks::print_task_times()
 {
 	float total = 0;
+	usleep(25*1000); // Let other core finish printing menu
 	cout << endl;
 	cout << "--- Task times ---" << endl;
 	for (int ii = 0; ii < NUM_STATES; ii++)

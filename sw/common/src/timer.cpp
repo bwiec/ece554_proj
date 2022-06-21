@@ -20,14 +20,6 @@ void timer::ttc_init()
 	{
 		cerr << "Failed to initialize ttc" << endl;
 	}
-
-	/*XTtcPs_SetOptions(&_ttc, (XTTCPS_OPTION_INTERVAL_MODE | XTTCPS_OPTION_MATCH_MODE));
-
-	XInterval ttc_interval = 0;
-	unsigned char ttc_prescaler = 0;
-	XTtcPs_CalcIntervalFromFreq(&_ttc, TTC_FREQ_HZ, &ttc_interval, &ttc_prescaler);
-	XTtcPs_SetInterval(&_ttc, ttc_interval);
-	XTtcPs_SetPrescaler(&_ttc, ttc_prescaler);*/
 }
 
 void timer::start()

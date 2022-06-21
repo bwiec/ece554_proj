@@ -27,6 +27,7 @@ class command
     unsigned char _pattern[NUM_CHANNELS];
     unsigned char _pattern_specific[NUM_CHANNELS];
     unsigned int _test_wdt;
+    unsigned int _print_times;
 
     bool channel_index_out_of_bounds(unsigned char idx);
     bool sample_rate_out_of_bounds(unsigned char sample_rate);
@@ -56,6 +57,10 @@ class command
     void set_test_wdt();
     void clr_test_wdt();
     int get_test_wdt();
+
+    void set_print_times();
+	void clr_print_times();
+	int get_print_times();
 
     void dump();
 

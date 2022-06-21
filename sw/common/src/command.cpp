@@ -11,6 +11,7 @@ command::command()
     _pattern_specific[ii] = 0;
   }
   _test_wdt = 0;
+  _print_times = 0;
 }
 
 bool command::channel_index_out_of_bounds(unsigned char idx)
@@ -153,6 +154,21 @@ int command::get_test_wdt()
 	return _test_wdt;
 }
 
+void command::set_print_times()
+{
+	_print_times = 1;
+}
+
+void command::clr_print_times()
+{
+	_print_times = 0;
+}
+
+int command::get_print_times()
+{
+	return _print_times;
+}
+
 void command::dump()
 {
 	cout << "***** Command *****" << endl;
@@ -166,8 +182,9 @@ void command::dump()
 		cout << "      _frequency: " << (int)_frequency[ii] << endl;
 		cout << "      _pattern: " << (int)_pattern[ii] << endl;
 		cout << "      _pattern_specific: " << (int)_pattern_specific[ii] << endl;
-		cout << "      test_wdt: " << (int)_test_wdt << endl;
 	}
+	cout << "test_wdt: " << (int)_test_wdt << endl;
+	cout << "print_times: " << (int)_print_times << endl;
 }
 
 command::~command()
