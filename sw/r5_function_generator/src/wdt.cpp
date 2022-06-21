@@ -2,7 +2,7 @@
 
 #define WDT_IRQ_ID 125U // First four are FIFO irqs, last one is wdt IRQ
 
-int wdt::gic_init(void (*isr)(void* data))
+int wdt::gic_init(void (*isr)(void*), void* data)
 {
 	XScuGic_Config* _cfg;
 	_cfg = XScuGic_LookupConfig(XPAR_SCUGIC_0_DEVICE_ID);
@@ -22,15 +22,15 @@ int wdt::gic_init(void (*isr)(void* data))
 	Xil_ExceptionRegisterHandler(XIL_EXCEPTION_ID_INT, (Xil_ExceptionHandler)XScuGic_InterruptHandler, &_gic);
 	Xil_ExceptionEnable();
 
-	XScuGic_Connect(&_gic, WDT_IRQ_ID, (Xil_ExceptionHandler)isr, &_gic);
+	XScuGic_Connect(&_gic, WDT_IRQ_ID, (Xil_ExceptionHandler)isr, data);
 	XScuGic_Enable(&_gic, WDT_IRQ_ID);
 
 	return 0;
 }
 
-wdt::wdt(int device_id, void (*isr)(void* data)) : _gpio(device_id)
+wdt::wdt(int device_id, void (*isr)(void*), void* data) : _gpio(device_id)
 {
-	gic_init(isr);
+	gic_init(isr, data);
 }
 
 void wdt::pet()

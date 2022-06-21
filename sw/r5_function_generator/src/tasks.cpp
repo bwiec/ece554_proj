@@ -4,11 +4,13 @@
 static void wdt_isr(void* data)
 {
 	cout << "WDT expired... resetting" << endl;
-	while(1);
+	reset* rst = (reset*)data;
+	rst->assert();
+	rst->deassert();
 }
 
 tasks::tasks(device_ids_t* device_ids) :
-	_wdt(device_ids->wdt_gpio, &wdt_isr),
+	_wdt(device_ids->wdt_gpio, &wdt_isr,(void*)(&_reset)),
 	_reset(device_ids->reset_gpio),
 	_sample_rate_gpio(device_ids->sample_rate_gpio), // Single sample period controls all channels for now
 	_hw_fifo0(device_ids->hw_fifo0),
@@ -57,12 +59,12 @@ void tasks::run()
 			break;
 		  case PET_WDT:
 			DEBUG_MSG("PET_WDT state");
-			_wdt.pet();
 			if (_cmd.get_test_wdt())
 			{
-				sleep(10);
 				_cmd.clr_test_wdt();
+				sleep(1);
 			}
+			_wdt.pet();
 			cur_state = RECV_CMD;
 			break;
 		  case RECV_CMD:
