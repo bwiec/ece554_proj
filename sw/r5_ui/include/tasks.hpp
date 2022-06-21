@@ -26,6 +26,10 @@ class tasks
 		command _cmd;
 		menu _menu;
 		mailbox _cmd_mailbox;
+
+		void pet_wdt();
+		void get_cmd();
+		void send_cmd();
 	
 	public:
 		tasks(device_ids_t* device_ids);
