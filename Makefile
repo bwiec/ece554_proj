@@ -14,31 +14,31 @@ all: xsa bitstream
 
 xsa: $(XSA)
 $(XSA):
-	make -C hw all
+	$(MAKE) -C hw all
 
 bitstream: build/proj/proj.runs/top.bit
 build/proj/proj.runs/top.bit: $(XSA)
-	make -C hw bitstream
+	$(MAKE) -C hw bitstream
 
 platform: 
-	make -C platform all
+	$(MAKE) -C platform all
 
 sw: 
-	make -C sw all
+	$(MAKE) -C sw all
 
 publish: all
 	cd ..
 	zip -r $(TIME)_ece554_proj_bwiec.zip ece554_proj
 
 clean_hw:
-	make -C hw clean
+	$(MAKE) -C hw clean
 
 clean_platform:
-	make -C platform clean
+	$(MAKE) -C platform clean
 
 clean_sw:
-	make -C sw clean
+	$(MAKE) -C sw clean
 
 clean: clean_hw clean_platform clean_sw
-	rm -rf .Xil
-	rm -f *.jou *.log
+	rm -rf .Xil Packages
+	rm -f *.jou *.log *.str

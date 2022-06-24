@@ -11,7 +11,7 @@ class hw_fifo
 {
   private:
     int _device_id;
-    XLlFifo _xllfifo_inst;
+    XLlFifo _xllfifo;
     
     void xllfifo_init();
 

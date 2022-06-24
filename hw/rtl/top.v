@@ -5,12 +5,13 @@ module top
 );
 
   localparam [31:0] CLK_PERIOD_NS = 10;
-  localparam [31:0] WDT_PERIOD_NS = 1000000; // 1-second
+  localparam [31:0] WDT_PERIOD_NS = 1000000000; // 1-second
 
   wire clk_100mhz;
   wire resetn;
   wire wdt_irq;
   wire wdt_pet;
+  wire wdt_pet_redge;
   wire [31:0] sample_period_ns;
   wire sample_ce;
 
@@ -23,6 +24,15 @@ module top
     .sample_period_ns(sample_period_ns),
     .sample_ce(sample_ce)
   );
+  
+  edge_det redge_det
+  (
+    .clk(clk_100mhz),
+    .ce(1),
+    .sig_in(wdt_pet),
+    .redge_det(wdt_pet_redge),
+    .fedge_det()
+  );
 
   wdt
   #(
@@ -32,7 +42,7 @@ module top
   (
     .clk(clk_100mhz),
     .rst(!resetn),
-    .pet(wdt_pet),
+    .pet(wdt_pet_redge),
     .irq(wdt_irq)
   );
 
@@ -42,8 +52,8 @@ module top
   )
   sample_ce_generator_inst
   (
-    .clk(clk),
-    .rst(rst),
+    .clk(clk_100mhz),
+    .rst(!resetn),
     .sample_period_ns(sample_period_ns),
     .ce(sample_ce)
   );

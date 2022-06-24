@@ -26,10 +26,12 @@ class command
     unsigned char _frequency[NUM_CHANNELS];
     unsigned char _pattern[NUM_CHANNELS];
     unsigned char _pattern_specific[NUM_CHANNELS];
+    unsigned int _test_wdt;
+    unsigned int _print_times;
 
     bool channel_index_out_of_bounds(unsigned char idx);
     bool sample_rate_out_of_bounds(unsigned char sample_rate);
-    bool frequency_out_of_bounds(unsigned char frequency);
+    bool frequency_out_of_bounds(unsigned char frequency, unsigned char sample_rate);
     bool pattern_illegal(unsigned char pattern);
     bool pattern_specific_out_of_bounds(pattern_t pattern, int pattern_specific);
 
@@ -51,6 +53,16 @@ class command
 
     void set_pattern_specific(unsigned char idx, int _pattern_specific);
     int get_pattern_specific(unsigned char idx);
+
+    void set_test_wdt();
+    void clr_test_wdt();
+    int get_test_wdt();
+
+    void set_print_times();
+	void clr_print_times();
+	int get_print_times();
+
+    void dump();
 
     ~command();
 };

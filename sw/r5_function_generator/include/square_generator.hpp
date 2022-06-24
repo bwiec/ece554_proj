@@ -9,7 +9,7 @@ using namespace std;
 class square_generator : public signal_generator
 {
   public:
-    square_generator(command* cmd, int channel_idx) : signal_generator(cmd, channel_idx) { };
+    square_generator(command* cmd, int channel_idx) : signal_generator(cmd, channel_idx) { }
     int calculate_sample(int n);
-    ~square_generator() { };
+    ~square_generator() { }
 };

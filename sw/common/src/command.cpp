@@ -10,11 +10,13 @@ command::command()
     _pattern[ii] = (unsigned char)PATTERN_SINE;
     _pattern_specific[ii] = 0;
   }
+  _test_wdt = 0;
+  _print_times = 0;
 }
 
 bool command::channel_index_out_of_bounds(unsigned char idx)
 {
-  if (idx < 0 || idx > NUM_CHANNELS)
+  if (idx < 0 || idx > NUM_CHANNELS-1)
   {
     cerr << "ERROR! Illegal channel index " << idx << endl;
     return true;
@@ -32,9 +34,9 @@ bool command::sample_rate_out_of_bounds(unsigned char sample_rate)
   return false;
 }
 
-bool command::frequency_out_of_bounds(unsigned char frequency)
+bool command::frequency_out_of_bounds(unsigned char frequency, unsigned char sample_rate)
 {
-  if (frequency > frequency / 2)
+  if (frequency > sample_rate / 2)
   {
     cerr << "ERROR! Illegal frequency " << frequency << endl;
     return true;
@@ -101,7 +103,7 @@ unsigned char command::get_sample_rate(unsigned char idx)
 void command::set_frequency(unsigned char idx, unsigned char frequency)
 {
   if (channel_index_out_of_bounds(idx)) { return; }
-  if (frequency_out_of_bounds(frequency)) { return; }
+  if (frequency_out_of_bounds(frequency, _sample_rate[idx])) { return; }
   _frequency[idx] = frequency;
 }
 
@@ -135,6 +137,54 @@ int command::get_pattern_specific(unsigned char idx)
 {
   if (channel_index_out_of_bounds(idx)) { return -1; }
   return _pattern_specific[idx];
+}
+
+void command::set_test_wdt()
+{
+	_test_wdt = 1;
+}
+
+void command::clr_test_wdt()
+{
+	_test_wdt = 0;
+}
+
+int command::get_test_wdt()
+{
+	return _test_wdt;
+}
+
+void command::set_print_times()
+{
+	_print_times = 1;
+}
+
+void command::clr_print_times()
+{
+	_print_times = 0;
+}
+
+int command::get_print_times()
+{
+	return _print_times;
+}
+
+void command::dump()
+{
+	cout << "***** Command *****" << endl;
+	for (int ii = 0; ii < NUM_CHANNELS; ii++)
+	{
+		cout << "  Channel " << ii << endl;
+		string ch_is_enabled;
+		ch_is_enabled = ((int)_channel_is_enabled & (1<<ii)) ? "true" : "false";
+		cout << "      _channel_is_enabled: " << ch_is_enabled << endl;
+		cout << "      _sample_rate: " << (int)_sample_rate[ii] << endl;
+		cout << "      _frequency: " << (int)_frequency[ii] << endl;
+		cout << "      _pattern: " << (int)_pattern[ii] << endl;
+		cout << "      _pattern_specific: " << (int)_pattern_specific[ii] << endl;
+	}
+	cout << "test_wdt: " << (int)_test_wdt << endl;
+	cout << "print_times: " << (int)_print_times << endl;
 }
 
 command::~command()

@@ -29,7 +29,8 @@ module sample_ce_generator
   end
 
   // Determine the number of clock ticks per sample period by floor(sample_period_ns/clk_period_ns)
-  wire [31:0] terminal_cnt;
+  wire udiv_data_valid;
+  wire [31:0] quotient;
   udiv
   #(
     .DWIDTH(32)
@@ -43,10 +44,22 @@ module sample_ce_generator
     .input_ready_for_data(), // Assuming software will always be slower
     .dividend(sample_period_ns),
     .divisor(CLK_PERIOD_NS),
-    .output_data_valid(),
-    .quotient(terminal_cnt),
+    .output_data_valid(udiv_data_valid),
+    .quotient(quotient),
     .remainder()
   );
+  
+  // Latch quotient
+  reg [31:0] terminal_cnt;
+  always @ (posedge clk) begin
+    if (rst) begin
+        terminal_cnt <= 0-1; // If 0, then it will go high immediately forever
+    end else begin
+        if (udiv_data_valid) begin
+            terminal_cnt <= quotient;
+        end
+    end
+  end
 
   // Main counter
   reg [31:0] cnt = 0;

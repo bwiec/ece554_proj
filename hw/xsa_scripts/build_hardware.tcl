@@ -13,7 +13,7 @@ if { [file exists ${proj_name}] == 1 } {
 # Create project
 #-----------------------------------------------------------
 create_project ${proj_name} "${proj_name}" -part xczu9eg-ffvb1156-2-e
-set_property BOARD_PART xilinx.com:kv260_som:part0:1.2 [current_project]
+set_property BOARD_PART xilinx.com:zcu102:part0:3.4 [current_project]
 
 #-----------------------------------------------------------
 # Add HDL source to design

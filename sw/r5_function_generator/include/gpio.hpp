@@ -11,7 +11,7 @@ class gpio
 {
   private:
     int _device_id;
-    XGpio _xgpio_inst;
+    XGpio _xgpio;
     
     void xgpio_init();
 
